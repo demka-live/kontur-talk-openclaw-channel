@@ -1,0 +1,34 @@
+{
+  "name": "@openclaw/kontur-talk-channel",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "OpenClaw channel plugin for Kontur Talk (Толк.Чаты) messenger",
+  "license": "MIT",
+  "openclaw": {
+    "extensions": ["./index.ts"],
+    "setupEntry": "./setup-entry.ts",
+    "channel": {
+      "id": "kontur-talk",
+      "label": "Kontur Talk",
+      "detailLabel": "Kontur Talk Bot",
+      "blurb": "Connect OpenClaw to Kontur Talk (Толк.Чаты) messenger via Bot API.",
+      "markdownCapable": true,
+      "exposure": {
+        "configured": true,
+        "setup": true,
+        "docs": true
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "openclaw": ">=2026.3.24-beta.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/node": "^22.0.0"
+  }
+}

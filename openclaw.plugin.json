@@ -1,0 +1,45 @@
+{
+  "id": "kontur-talk",
+  "kind": "channel",
+  "channels": ["kontur-talk"],
+  "name": "Kontur Talk",
+  "description": "Channel plugin for Kontur Talk (Толк.Чаты) messenger",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "kontur-talk": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "JWT bot token from Толк.Чаты"
+          },
+          "baseUrl": {
+            "type": "string",
+            "description": "Base URL of the Talk API (default: https://chat.ktalk.ru)"
+          },
+          "pollingTimeout": {
+            "type": "number",
+            "description": "Long polling timeout in seconds (1-60, default: 30)"
+          },
+          "allowFrom": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Allowed user IDs for DM access"
+          },
+          "dmSecurity": {
+            "type": "string",
+            "enum": ["open", "allowlist"],
+            "description": "DM security policy (default: allowlist)"
+          },
+          "requireMention": {
+            "type": "boolean",
+            "description": "Require @mention in group chats (default: true)"
+          }
+        },
+        "required": ["token"]
+      }
+    }
+  }
+}
