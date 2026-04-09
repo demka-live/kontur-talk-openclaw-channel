@@ -6,92 +6,91 @@
  */
 
 import { defineChannelPluginEntry } from "openclaw/plugin-sdk/channel-core";
-import { konturTalkPlugin, resolveAccount, createClient } from "./src/channel.js";
+import type { ChannelPlugin } from "openclaw/plugin-sdk/channel-core";
+import { konturTalkPlugin, resolveAccount } from "./src/channel.js";
 import { KonturTalkPoller } from "./src/poller.js";
 import { createInboundHandler } from "./src/inbound.js";
 import type { ResolvedAccount } from "./src/types.js";
 
-export default defineChannelPluginEntry({
-  id: "kontur-talk",
-  name: "Kontur Talk",
-  description:
-    "Channel plugin for Kontur Talk (Толк.Чаты) messenger via Bot API long-polling",
-  plugin: konturTalkPlugin,
+const entry: ReturnType<typeof defineChannelPluginEntry<ChannelPlugin<ResolvedAccount>>> =
+  defineChannelPluginEntry<ChannelPlugin<ResolvedAccount>>({
+    id: "kontur-talk",
+    name: "Kontur Talk",
+    description:
+      "Channel plugin for Kontur Talk (Толк.Чаты) messenger via Bot API long-polling",
+    plugin: konturTalkPlugin,
 
-  registerCliMetadata(api) {
-    api.registerCli(
-      ({ program }) => {
-        program
-          .command("kontur-talk")
-          .description("Kontur Talk channel management");
-      },
-      {
-        descriptors: [
-          {
-            name: "kontur-talk",
-            description: "Kontur Talk channel management",
-            hasSubcommands: false,
-          },
-        ],
-      },
-    );
-  },
-
-  registerFull(api) {
-    let poller: KonturTalkPoller | null = null;
-
-    let account: ResolvedAccount;
-    try {
-      account = resolveAccount(api.config);
-    } catch {
-      api.logger.warn(
-        "[kontur-talk] channel not configured — skipping service registration",
+    registerCliMetadata(api) {
+      api.registerCli(
+        ({ program }) => {
+          program
+            .command("kontur-talk")
+            .description("Kontur Talk channel management");
+        },
+        {
+          descriptors: [
+            {
+              name: "kontur-talk",
+              description: "Kontur Talk channel management",
+              hasSubcommands: false,
+            },
+          ],
+        },
       );
-      return;
-    }
+    },
 
-    const botTokenPayload = decodeJwtPayload(account.token);
-    const botUserId = botTokenPayload?.sub ?? "unknown-bot";
+    registerFull(api) {
+      let poller: KonturTalkPoller | null = null;
 
-    const inboundHandler = createInboundHandler({
-      account,
-      botUserId,
-      onTextMessage: async (params) => {
-        api.logger.info(
-          `[kontur-talk] text from ${params.senderId} in ${params.conversationId}: ${params.text.slice(0, 80)}`,
+      let account: ResolvedAccount;
+      try {
+        account = resolveAccount(api.config);
+      } catch {
+        api.logger.warn(
+          "[kontur-talk] channel not configured — skipping service registration",
         );
-        // Dispatch to OpenClaw's inbound pipeline.
-        // The actual dispatch method depends on how the host runtime
-        // exposes the inbound record-and-dispatch surface.
-        // Plugins using `api.runtime.channel.inbound?.dispatch(...)` or
-        // the registered inbound handler will pick this up.
-      },
-      onMediaMessage: async (params) => {
-        api.logger.info(
-          `[kontur-talk] media (${params.mediaType}) from ${params.senderId} in ${params.conversationId}`,
-        );
-      },
-      logger: api.logger,
-    });
+        return;
+      }
 
-    api.registerService({
-      name: "kontur-talk-poller",
-      async start() {
-        poller = new KonturTalkPoller({
-          account,
-          dispatch: inboundHandler,
-          logger: api.logger,
-        });
-        poller.start().catch((err) => {
-          api.logger.error("[kontur-talk] poller crashed:", err);
-        });
-      },
-      async stop() {
-        poller?.stop();
-      },
-    });
-  },
-});
+      const botTokenPayload = decodeJwtPayload(account.token);
+      const botUserId = botTokenPayload?.sub ?? "unknown-bot";
+
+      const inboundHandler = createInboundHandler({
+        account,
+        botUserId,
+        onTextMessage: async (params) => {
+          api.logger.info(
+            `[kontur-talk] text from ${params.senderId} in ${params.conversationId}: ${params.text.slice(0, 80)}`,
+          );
+        },
+        onMediaMessage: async (params) => {
+          api.logger.info(
+            `[kontur-talk] media (${params.mediaType}) from ${params.senderId} in ${params.conversationId}`,
+          );
+        },
+        logger: api.logger,
+      });
+
+      api.registerService({
+        id: "kontur-talk-poller",
+        async start() {
+          poller = new KonturTalkPoller({
+            account,
+            dispatch: inboundHandler,
+            logger: api.logger,
+          });
+          poller.start().catch((err) => {
+            api.logger.error(`[kontur-talk] poller crashed: ${String(err)}`);
+          });
+        },
+        async stop() {
+          poller?.stop();
+        },
+      });
+    },
+  });
+
+export default entry;
 
 /**
  * Decode the payload section of a JWT token without verification.
