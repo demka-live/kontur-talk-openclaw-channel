@@ -14,7 +14,11 @@ export type InboundDispatcher = (message: TalkMessage) => Promise<void>;
 export interface PollerOptions {
   account: ResolvedAccount;
   dispatch: InboundDispatcher;
-  logger: { info: (...a: any[]) => void; warn: (...a: any[]) => void; error: (...a: any[]) => void };
+  logger: {
+    info: (message: string) => void;
+    warn: (message: string) => void;
+    error: (message: string) => void;
+  };
 }
 
 export class KonturTalkPoller {
@@ -45,13 +49,13 @@ export class KonturTalkPoller {
           try {
             await this.dispatch(msg);
           } catch (err) {
-            this.logger.error("[kontur-talk] dispatch error:", err);
+            this.logger.error(`[kontur-talk] dispatch error: ${String(err)}`);
           }
         }
       } catch (err: any) {
         if (!this.running) break;
         if (err?.name === "AbortError") continue;
-        this.logger.warn("[kontur-talk] polling error, retrying in 5s:", err);
+        this.logger.warn(`[kontur-talk] polling error, retrying in 5s: ${String(err)}`);
         await sleep(5000);
       }
     }
