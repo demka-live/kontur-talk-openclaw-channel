@@ -102,12 +102,14 @@ export class KonturTalkClient {
    * Upload an image and receive an MXC URL (POST /upload_image).
    */
   async uploadImage(
-    imageBuffer: Buffer,
+    imageBuffer: Uint8Array,
     filename: string,
     contentType: string = "image/png",
   ): Promise<TalkUploadResponse> {
     const formData = new FormData();
-    const blob = new Blob([imageBuffer], { type: contentType });
+    const arrayBuf = new ArrayBuffer(imageBuffer.byteLength);
+    new Uint8Array(arrayBuf).set(imageBuffer);
+    const blob = new Blob([arrayBuf], { type: contentType });
     formData.append("image", blob, filename);
 
     const res = await fetch(this.url("/upload_image"), {

@@ -7,7 +7,6 @@
  */
 
 import type { TalkMessage, TalkTextMessage, TalkMediaMessage, ResolvedAccount } from "./types.js";
-import { KonturTalkClient } from "./client.js";
 
 export interface InboundContext {
   account: ResolvedAccount;
@@ -34,9 +33,9 @@ export interface InboundContext {
     timestamp: number;
   }) => Promise<void>;
   logger: {
-    info: (...a: any[]) => void;
-    warn: (...a: any[]) => void;
-    debug: (...a: any[]) => void;
+    info: (message: string) => void;
+    warn: (message: string) => void;
+    debug?: (message: string) => void;
   };
 }
 
@@ -48,55 +47,45 @@ export function createInboundHandler(ctx: InboundContext) {
     const wasMentioned = checkMention(message, ctx.botUserId);
 
     if (!isDirect && ctx.account.requireMention && !wasMentioned) {
-      ctx.logger.debug(
+      ctx.logger.debug?.(
         `[kontur-talk] skipping group message without mention from ${message.user_id}`,
       );
       return;
     }
 
-    switch (message.message_type) {
-      case "m.text": {
-        const textMsg = message as TalkTextMessage;
-        const cleanedText = stripMention(textMsg.body, ctx.botUserId);
-        await ctx.onTextMessage({
+    if (message.message_type === "m.text") {
+      const textMsg = message as TalkTextMessage;
+      const cleanedText = stripMention(textMsg.body, ctx.botUserId);
+      await ctx.onTextMessage({
+        conversationId: message.room_id,
+        senderId: message.user_id,
+        text: cleanedText,
+        threadId: message.thread_id,
+        replyToId: message.reply_id,
+        messageId: message.event_id,
+        isDirect,
+        timestamp: message.timestamp,
+        wasMentioned,
+      });
+    } else if (
+      message.message_type === "m.image" ||
+      message.message_type === "m.video" ||
+      message.message_type === "m.file" ||
+      message.message_type === "m.audio"
+    ) {
+      if (ctx.onMediaMessage) {
+        const mediaMsg = message as TalkMediaMessage;
+        await ctx.onMediaMessage({
           conversationId: message.room_id,
           senderId: message.user_id,
-          text: cleanedText,
+          mediaType: message.message_type,
+          mediaUrl: mediaMsg.media_url,
           threadId: message.thread_id,
-          replyToId: message.reply_id,
           messageId: message.event_id,
           isDirect,
           timestamp: message.timestamp,
-          wasMentioned,
         });
-        break;
       }
-      case "m.image":
-      case "m.video":
-      case "m.file":
-      case "m.audio": {
-        if (ctx.onMediaMessage) {
-          const mediaMsg = message as TalkMediaMessage;
-          await ctx.onMediaMessage({
-            conversationId: message.room_id,
-            senderId: message.user_id,
-            mediaType: message.message_type,
-            mediaUrl: mediaMsg.media_url,
-            threadId: message.thread_id,
-            messageId: message.event_id,
-            isDirect,
-            timestamp: message.timestamp,
-          });
-        }
-        break;
-      }
-      case "msg.call_start":
-      case "msg.call_end":
-        break;
-      default:
-        ctx.logger.debug(
-          `[kontur-talk] ignoring unsupported message_type: ${message.message_type}`,
-        );
     }
   };
 }
