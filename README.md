@@ -35,39 +35,34 @@ OpenClaw channel plugin for **Kontur Talk (Толк.Чаты)** — корпор
 }
 ```
 
-## Сборка
+## Установка в OpenClaw
+
+### Вариант 1: Установка из GitHub Release (рекомендуемый)
+
+Скачайте готовый архив из [Releases](../../releases/latest) и установите:
+
+```bash
+# Скачайте и распакуйте последний релиз
+curl -L https://github.com/demka-live/kontur-talk-openclaw-channel/releases/latest/download/openclaw-kontur-talk.tar.gz -o openclaw-kontur-talk.tar.gz
+tar -xzf openclaw-kontur-talk.tar.gz
+
+# Установите плагин
+openclaw plugins install ./openclaw-kontur-talk/
+```
+
+### Вариант 2: Сборка из исходников
 
 ```bash
 # Клонируйте репозиторий
-git clone <url-репозитория>
+git clone https://github.com/demka-live/kontur-talk-openclaw-channel.git
 cd kontur-talk-openclaw-channel
 
-# Установите зависимости
+# Установите зависимости и проверьте типы
 npm install
+npm run check
 
-# Скомпилируйте TypeScript
-npm run build
-```
-
-## Установка в OpenClaw
-
-### Вариант 1: Установка из локальной директории
-
-```bash
-# Из директории с собранным плагином
-openclaw plugins install /path/to/kontur-talk-openclaw-channel/
-```
-
-### Вариант 2: Установка из npm (после публикации)
-
-```bash
-openclaw plugins install openclaw-kontur-talk
-```
-
-### Вариант 3: Установка из ClawHub (после публикации)
-
-```bash
-openclaw plugins install clawhub:openclaw-kontur-talk
+# Установите плагин из текущей директории
+openclaw plugins install ./
 ```
 
 ## Конфигурация
@@ -196,6 +191,21 @@ JWT-токен недействителен или истёк. Создайте 
 ### Ошибка 403 Forbidden
 
 Бот не имеет прав для отправки сообщений в комнату. Обратитесь к администратору пространства.
+
+## Создание нового релиза
+
+Релизы собираются автоматически через GitHub Actions. Для публикации новой версии:
+
+```bash
+# Обновите версию в package.json, затем:
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+GitHub Actions автоматически:
+1. Проверит типизацию (`npm run check`)
+2. Соберёт архив `openclaw-kontur-talk.tar.gz` со всеми необходимыми файлами
+3. Создаст GitHub Release с архивом
 
 ## Лицензия
 

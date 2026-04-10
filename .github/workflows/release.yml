@@ -1,0 +1,45 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dev dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npm run check
+
+      - name: Prepare release archive
+        run: |
+          RELEASE_DIR="openclaw-kontur-talk"
+          mkdir -p "$RELEASE_DIR/src"
+
+          cp package.json openclaw.plugin.json tsconfig.json "$RELEASE_DIR/"
+          cp index.ts setup-entry.ts "$RELEASE_DIR/"
+          cp src/*.ts "$RELEASE_DIR/src/"
+
+          if [ -f README.md ]; then cp README.md "$RELEASE_DIR/"; fi
+          if [ -f LICENSE ]; then cp LICENSE "$RELEASE_DIR/"; fi
+
+          tar -czf openclaw-kontur-talk.tar.gz "$RELEASE_DIR"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: openclaw-kontur-talk.tar.gz
+          generate_release_notes: true
