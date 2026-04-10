@@ -8,9 +8,9 @@
 import {
   createChatChannelPlugin,
   createChannelPluginBase,
-} from "openclaw/plugin-sdk/channel-core";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/channel-core";
-import type { ChannelPlugin } from "openclaw/plugin-sdk/channel-core";
+} from "./sdk.js";
+import type { OpenClawConfig } from "./sdk.js";
+import type { ChannelPlugin } from "./sdk.js";
 import { KonturTalkClient } from "./client.js";
 import type { ResolvedAccount } from "./types.js";
 

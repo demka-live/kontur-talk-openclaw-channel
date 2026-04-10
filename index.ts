@@ -5,8 +5,8 @@
  * Registers the channel, the long-polling background service, and CLI commands.
  */
 
-import { defineChannelPluginEntry } from "openclaw/plugin-sdk/channel-core";
-import type { ChannelPlugin } from "openclaw/plugin-sdk/channel-core";
+import { defineChannelPluginEntry } from "./src/sdk.js";
+import type { ChannelPlugin } from "./src/sdk.js";
 import { konturTalkPlugin, resolveAccount } from "./src/channel.js";
 import { KonturTalkPoller } from "./src/poller.js";
 import { createInboundHandler } from "./src/inbound.js";
