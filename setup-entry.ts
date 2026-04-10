@@ -6,7 +6,7 @@
  * heavy runtime dependencies.
  */
 
-import { defineSetupPluginEntry } from "openclaw/plugin-sdk/channel-core";
+import { defineSetupPluginEntry } from "./src/sdk.js";
 import { konturTalkPlugin } from "./src/channel.js";
 
 export default defineSetupPluginEntry(konturTalkPlugin);
