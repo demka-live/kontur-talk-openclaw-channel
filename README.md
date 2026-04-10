@@ -55,19 +55,19 @@ npm run build
 
 ```bash
 # Из директории с собранным плагином
-openclaw plugins install /path/to/kontur-talk-openclaw-channel
+openclaw plugins install /path/to/kontur-talk-openclaw-channel/
 ```
 
 ### Вариант 2: Установка из npm (после публикации)
 
 ```bash
-openclaw plugins install @openclaw/kontur-talk-channel
+openclaw plugins install openclaw-kontur-talk
 ```
 
 ### Вариант 3: Установка из ClawHub (после публикации)
 
 ```bash
-openclaw plugins install clawhub:@openclaw/kontur-talk-channel
+openclaw plugins install clawhub:openclaw-kontur-talk
 ```
 
 ## Конфигурация
