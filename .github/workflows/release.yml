@@ -26,7 +26,7 @@ jobs:
 
       - name: Prepare release archive
         run: |
-          RELEASE_DIR="openclaw-kontur-talk"
+          RELEASE_DIR="kontur-talk"
           mkdir -p "$RELEASE_DIR/src"
 
           cp package.json openclaw.plugin.json tsconfig.json "$RELEASE_DIR/"
@@ -36,10 +36,10 @@ jobs:
           if [ -f README.md ]; then cp README.md "$RELEASE_DIR/"; fi
           if [ -f LICENSE ]; then cp LICENSE "$RELEASE_DIR/"; fi
 
-          tar -czf openclaw-kontur-talk.tar.gz "$RELEASE_DIR"
+          tar -czf kontur-talk.tar.gz "$RELEASE_DIR"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: openclaw-kontur-talk.tar.gz
+          files: kontur-talk.tar.gz
           generate_release_notes: true

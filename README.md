@@ -43,11 +43,11 @@ OpenClaw channel plugin for **Kontur Talk (Толк.Чаты)** — корпор
 
 ```bash
 # Скачайте и распакуйте последний релиз
-curl -L https://github.com/demka-live/kontur-talk-openclaw-channel/releases/latest/download/openclaw-kontur-talk.tar.gz -o openclaw-kontur-talk.tar.gz
-tar -xzf openclaw-kontur-talk.tar.gz
+curl -L https://github.com/demka-live/kontur-talk-openclaw-channel/releases/latest/download/kontur-talk.tar.gz -o kontur-talk.tar.gz
+tar -xzf kontur-talk.tar.gz
 
 # Установите плагин
-openclaw plugins install ./openclaw-kontur-talk/
+openclaw plugins install ./kontur-talk/
 ```
 
 ### Вариант 2: Сборка из исходников

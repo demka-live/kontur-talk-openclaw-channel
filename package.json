@@ -1,5 +1,5 @@
 {
-  "name": "openclaw-kontur-talk",
+  "name": "kontur-talk",
   "version": "1.0.0",
   "type": "module",
   "description": "OpenClaw channel plugin for Kontur Talk (Толк.Чаты) messenger",
